@@ -1,0 +1,8 @@
+streamlit
+langchain
+langchain-community
+langchain-google-genai
+faiss-cpu
+PyPDF2
+python-dotenv
+numpy==1.26.4
