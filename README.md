@@ -48,7 +48,7 @@ pip install -r requirements.txt
 
 ```bash
 create .env file 
-GOOGLE_API_KEY=AQ.Ab8RN6IdrEbhn8rquCSk3C4OpiBEEvrD0N8ZX3-N4-QWd6SBVg
+"GOOGLE_API_KEY=AQ.Ab8RN6IdrEbhn8rquCSk3C4OpiBEEvrD0N8ZX3-N4-QWd6SBVg"
 ```
 
 Add your Google API key:
