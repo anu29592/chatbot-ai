@@ -1,10 +1,10 @@
-# 🤖 AI Chatbot with RAG (Gemini + LangChain + FAISS)
+# 🤖 AI Chatbot with RAG (Gemini + HuggingFace + LangChain + FAISS)
 
 A simple AI chatbot that answers questions from multi-format documents and fetches dynamic data from external services.
 
 ---
 
-## 🚀 Features
+##  Features
 
 * 📄 Multi-format document support (PDF, Markdown, TXT)
 * 🧠 Retrieval-Augmented Generation (RAG)
@@ -20,8 +20,8 @@ A simple AI chatbot that answers questions from multi-format documents and fetch
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/ai-chatbot-rag.git
-cd ai-chatbot-rag
+git clone https://github.com/your-username/chatbot-ai.git
+
 ```
 
 ---
@@ -31,7 +31,7 @@ cd ai-chatbot-rag
 ```bash
 python -m venv venv
 source venv/bin/activate   # Mac/Linux
-venv\Scripts\activate      # Windows
+
 ```
 
 ---
@@ -70,8 +70,11 @@ streamlit run app/main.py
 
 ### 📚 Static (RAG)
 
-* "What is the company vacation policy?"
-* "Explain onboarding guidelines"
+How do we request a vacation?
+what are coding standards for formatting?
+what are benefits of company policy?
+
+
 
 ### 🌐 Dynamic (External API)
 
@@ -120,24 +123,13 @@ streamlit run app/main.py
 
 ---
 
-## 📸 Screenshot
 
-*Add a screenshot here (screenshots/ui.png)*
-
----
 
 ## 👨‍💻 Author
 
-Your Name
+Archana Aswathaiah
 
 ---
 
-## ⭐ Notes
 
-This project is intentionally simple and focuses on:
 
-* Clean architecture
-* Separation of concerns
-* Demonstrating RAG + external integrations
-
----
