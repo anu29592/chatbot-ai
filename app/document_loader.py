@@ -1,29 +1,33 @@
+from pathlib import Path
 from PyPDF2 import PdfReader
 
 
-def load_pdf(path):
+def load_pdf(path: str) -> str:
     reader = PdfReader(path)
-    text = ""
-    for page in reader.pages:
-        text += page.extract_text() or ""
-    return text
+    return "\n".join(page.extract_text() or "" for page in reader.pages)
 
 
-def load_txt(path):
-    with open(path, "r", encoding="utf-8") as f:
-        return f.read()
+def load_txt(path: str) -> str:
+    return Path(path).read_text(encoding="utf-8")
 
 
-def load_md(path):
-    with open(path, "r", encoding="utf-8") as f:
-        return f.read()
+def load_md(path: str) -> str:
+    return Path(path).read_text(encoding="utf-8")
 
 
-def load_all_documents():
+FILES = {
+    "data/contract.pdf": load_pdf,
+    "data/policy.md":    load_md,
+    "data/handbook.txt": load_txt,
+}
+
+
+def load_all_documents() -> list[str]:
     docs = []
-
-    docs.append(load_pdf("data/contract.pdf"))
-    docs.append(load_md("data/policy.md"))
-    docs.append(load_txt("data/handbook.txt"))
-
+    for path, loader in FILES.items():
+        if not Path(path).exists():
+            print(f"Warning: {path} not found, skipping.")
+            continue
+        print(f"Loading: {path}")
+        docs.append(loader(path))
     return docs

@@ -9,7 +9,7 @@ A simple AI chatbot that answers questions from multi-format documents and fetch
 * 📄 Multi-format document support (PDF, Markdown, TXT)
 * 🧠 Retrieval-Augmented Generation (RAG)
 * ⚡ Fast similarity search with FAISS
-* 🤖 Google Gemini (LLM + embeddings)
+* 🤖 Google Gemini (LLM) & HuggingFace (Local Embeddings)
 * 🌐 Dynamic data via external API (mocked)
 * 🎨 Simple UI using Streamlit
 
@@ -114,7 +114,7 @@ streamlit run app/main.py
 * Python
 * Streamlit
 * LangChain
-* Google Gemini
+* Google Gemini (LLM) & HuggingFace (Local Embeddings)
 * FAISS
 * PyPDF2
 

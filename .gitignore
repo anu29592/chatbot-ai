@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*$py.class
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+.env
+.venv
+env/
+.ENV
+
+# FAISS index
+faiss_index/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Session State for Streamlit
+.st.session_state.json
+
+# Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Cache
+.cache/

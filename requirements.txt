@@ -6,3 +6,7 @@ faiss-cpu
 PyPDF2
 python-dotenv
 numpy==1.26.4
+sentence-transformers
+torch
+google-generativeai
+transformers

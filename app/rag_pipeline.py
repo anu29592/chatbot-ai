@@ -1,98 +1,67 @@
 
-
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import FAISS
-import google.generativeai as genai
 import os
 from dotenv import load_dotenv
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+from typing import Callable
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI
 from document_loader import load_all_documents
-from typing import Callable, Any
-
+from langchain_core.messages import HumanMessage
 load_dotenv()
-genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
+print(os.getenv("GOOGLE_API_KEY"))
 
-def list_available_models() -> None:
-    """Print available Google Generative AI models."""
-    print("Available Google Generative AI models:")
-    for model in genai.list_models():
-        print(model.name)
-
-list_available_models()
-
-
-def create_rag_chain() -> Callable[[str], Any]:
-    """
-    Create a Retrieval-Augmented Generation (RAG) QA chain.
-    Returns a function that takes a query string and returns an answer from the LLM.
-    """
+def create_rag_chain() -> Callable[[str], str]:
     # 1. Load and split documents
-    raw_docs = load_all_documents()
+    # Ensure load_all_documents() returns a list of strings or Documents
+    raw_docs = load_all_documents() 
+    
     splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-    docs = [chunk for text in raw_docs for chunk in splitter.create_documents([text])]
+    
+    # If raw_docs is a list of strings:
+    doc_objs = splitter.create_documents(raw_docs)
+    # If raw_docs is already a list of Document objects, use:
+    # doc_objs = splitter.split_documents(raw_docs)
 
-    # 2. Embeddings (Gemini)
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-2-preview")
-    texts = [doc.page_content for doc in docs]
+    if not doc_objs:
+        raise ValueError("No documents loaded for RAG pipeline.")
 
-    # 3. Vector DB (FAISS)
-    from langchain_core.documents import Document
-    doc_objs = [Document(page_content=text) for text in texts]
-    class DummyEmbeddings:
-        def embed_documents(self, texts):
-            return [embeddings.embed_documents([text])[0] for text in texts]
-        def embed_query(self, text):
-            return embeddings.embed_documents([text])[0]
-        def __call__(self, text):
-            return self.embed_query(text)
-    vectorstore = FAISS.from_documents(doc_objs, DummyEmbeddings())
-    retriever = vectorstore.as_retriever()
+    # 2. Embeddings (local)
+    # This won't trigger the 'unhashable' error because it's the official class
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
+    # 3. Vector store
+    vectorstore = FAISS.from_documents(doc_objs, embeddings)
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+    
     # 4. LLM (Gemini)
-    llm = ChatGoogleGenerativeAI(model="models/gemini-3.1-flash-lite-preview")
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash-lite",
+        temperature=0.2,
+        google_api_key=os.getenv("GOOGLE_API_KEY")
+    )
 
     def qa_chain(query: str) -> str:
-        """
-        Retrieve relevant docs and generate an answer using the LLM.
-        """
-        docs = retriever.invoke(query)
-        context = "\n".join([doc.page_content for doc in docs])
-        prompt = f"Answer the question based on the following context:\n{context}\n\nQuestion: {query}\nAnswer:"
+        if not query.strip():
+            return "Please enter a valid question."
+        
+        # Retrieval
+        retrieved_docs = retriever.invoke(query)
+        context = "\n\n".join([doc.page_content for doc in retrieved_docs])
+        
+        # Prompting
+        prompt = (
+            f"Use the following pieces of retrieved context to answer the question. "
+            f"If you don't know the answer, just say that you don't know.\n\n"
+            f"Context:\n{context}\n\n"
+            f"Question: {query}\n"
+            f"Answer:"
+        )
+        
         try:
-            response = llm.invoke(prompt)
+            response = llm.invoke([HumanMessage(content=prompt)])
+            return response.content
         except Exception as e:
-            print(f"Error invoking LLM: {e}")
-            return "Sorry, there was an error generating a response."
-
-        # Handle response as dict with 'content' key
-        if isinstance(response, dict) and "content" in response:
-            content = response["content"]
-            print(f"LLM response content: {content}")
-            print(f"LLM response content type: {type(content)}")
-            print(f"LLM response content sample: {response}")
-            # If content is a list of dicts with 'text' key
-            if isinstance(content, list) and isinstance(content[0], dict) and "text" in content[0]:
-                return content[0]["text"]
-            # If content is a string, return it directly
-            if isinstance(content, str):
-                return content
-            # If content is a list of strings
-            if isinstance(content, list) and isinstance(content[0], str):
-                return content[0]
-            # Fallback: return string representation
-            return str(content)
-        if isinstance(response, str):
-            
-            return response["content"][0]["text"]
-        # If response is a list of dicts with 'text' key
-        if isinstance(response, list) and isinstance(response[0], dict) and "text" in response[0]:
-            return response["content"][0]["text"]
-        # If response is a list of strings
-        if isinstance(response, list) and isinstance(response, str):
-            return response["content"][0]["text"]
-        # Fallback: return string representation
-        print(f"LLM response type: {type(response)}")
-        print(f"LLM response content: {response}")
-        return str(response.content[0]["text"])
+            return f"Error invoking LLM: {str(e)}"
 
     return qa_chain
