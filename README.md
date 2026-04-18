@@ -82,35 +82,6 @@ what are benefits of company policy?
 
 ---
 
-## 🧠 Design Decisions
-
-### 1. RAG over fine-tuning
-
-* Lightweight and scalable
-* No need for model retraining
-
-### 2. FAISS for vector search
-
-* Fast and efficient similarity retrieval
-* Works locally without external services
-
-### 3. Rule-based routing
-
-* Simple and transparent
-* Easy to extend
-
----
-
-## 🔄 Future Improvements
-
-* Replace rule-based routing with LLM-based intent classification
-* Add chat memory (conversation history)
-* Persist FAISS index
-* Integrate real backend APIs
-* Add authentication
-* Deploy on AWS (S3, Lambda, API Gateway)
-
----
 
 ## 🧪 Tech Stack
 
