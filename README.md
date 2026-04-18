@@ -20,7 +20,7 @@ A simple AI chatbot that answers questions from multi-format documents and fetch
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/chatbot-ai.git
+git clone https://github.com/anu29592/chatbot-ai.git
 
 ```
 
